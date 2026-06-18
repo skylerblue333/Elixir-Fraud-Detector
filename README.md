@@ -1,0 +1,1 @@
+# Elixir-Fraud-Detector\n\n## Overview\nEnterprise-grade fraud detector implementation in Elixir.\n\n## Quick Start (1-Click Build)\n\n```bash\ngit clone https://github.com/skylerblue333/Elixir-Fraud-Detector.git\ncd Elixir-Fraud-Detector\n# Build instructions depend on the language\n```\n
