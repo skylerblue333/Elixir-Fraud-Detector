@@ -1,44 +1,35 @@
-<!-- PORTFOLIO PROJECT PROFILE: maintained by the repository owner -->
+# Sky Fraud Rules — Elixir
 
-## Project profile and code-audit snapshot
+A dependency-free Elixir engineering-beta component for deterministic transaction **risk-rule evaluation**. It converts caller-supplied transaction attributes into explainable risk signals and an advisory score; it does not decide that a person or transaction is fraudulent.
 
-**What this is:** **Elixir-Fraud-Detector** is a public repository described as: “Enterprise-grade fraud detector implementation in Elixir. #SkyCoin4444 #AI #Blockchain #DevOps #Innovation” Its dominant language signals are **Python (4 files)**.
+## What is implemented
 
-**Why it has value:** Its value is best understood through the implementation evidence currently present in the repository: **18 tracked files** were observed in the shallow audit, with the source structure and existing documentation providing the project’s specific context. This README does not treat a prototype, experiment, or archive as a production system without supporting evidence.
+The current rule set accepts bounded integer minor-unit amounts, recent transaction velocity, a two-letter country code, card-present status, and trusted-device status. It returns deterministic signal IDs, point values, a score capped at 100, and one of three advisory bands: `low`, `elevated`, or `review`.
 
-**Implementation evidence:** 2 test-related file(s) detected; 2 dependency or package manifest(s) detected; 2 build/CI/infrastructure signal(s) detected; and 3 documentation or governance file(s) detected. Test filenames observed include `tests/__init__.py`, `tests/test_main.py`. Dependency or package files include `package.json`, `requirements.txt`. Build, CI, or infrastructure signals include `Dockerfile`, `.github/workflows/ci.yml`.
+```bash
+mix test
+mix escript.build
+./sky_fraud 2000000 20 ZZ false false
+```
 
-**Current status:** The repository is tracked on the `main` branch. The existing source tree, configuration, tests, workflows, and documentation remain authoritative for supported behavior and maturity. A code audit is not a production-readiness certification, and the presence of a test or workflow file does not establish that all checks pass.
+Example output:
 
-**Relationship to the wider portfolio:** This repository is one focused component of the broader Skyler Blue Spillers portfolio across AI, software engineering, cloud and DevOps, cybersecurity, blockchain, finance, education, social systems, and creative work. It may provide a service boundary, implementation pattern, experiment, archive, or reusable idea for related repositories. Treat repositories as technical dependencies only where documented interfaces and verified project requirements support that relationship.
+```text
+score=100 band=review decision=advisory_only signals=high_amount,high_velocity,unlisted_country,card_not_present,untrusted_device
+```
 
-**Quality and security note:** No obvious secret-like pattern was detected by the limited static scan; this is not a substitute for a security audit. No TODO/FIXME marker was detected in the scanned text files.
+The built-in country set and thresholds are demonstration policy, not verified fraud intelligence or regulatory guidance.
 
----
+## Verification gate
 
-# Elixir Fraud Detector
+GitHub Actions runs `mix format --check-formatted`, compilation with warnings as errors, ExUnit tests, escript packaging, a CLI smoke test, a Docker build, non-root UID verification, and a containerized low-risk smoke case.
 
-![GitHub stars](https://img.shields.io/github/stars/skylerblue333/Elixir-Fraud-Detector?style=flat-square)
-![GitHub license](https://img.shields.io/github/license/skylerblue333/Elixir-Fraud-Detector?style=flat-square)
+## Product and safety boundary
 
-## 🌟 Overview
-**Elixir-Fraud-Detector** is a professional-grade project within the **SkyCoin4444** ecosystem. It focuses on delivering high-value solutions in the domain of **Python**.
+This repository does not connect to banks, payment processors, identity providers, device-intelligence networks, sanctions/watchlists, or live fraud feeds. It has no trained ML model, behavioral profile store, durable case management, automatic payment blocking, customer identity verification, explainability certification, regulatory decisioning, appeals workflow, tenant isolation, authentication, HA, or verified production deployment.
 
-## 🚀 Key Features
-- **Scalable Architecture**: Designed for enterprise-level growth and performance.
-- **Modern Standards**: Implements best practices for clean code and maintainability.
-- **Robust Integration**: Built to work seamlessly within modern cloud-native environments.
+A high score means only that the supplied fields triggered the repository's explicit demonstration rules. It must not be treated as proof of fraud or as the sole basis for financial, legal, employment, housing, insurance, credit, or other consequential decisions.
 
-## 🛠️ Technology Stack
-- **Primary Domain**: Python
-- **Ecosystem**: SkyCoin4444 Digital Platform
+## SKYCOIN4444 integration role
 
-## 📂 Structure
-The project is organized into a modular structure to ensure clarity and ease of development.
-
-## 👨‍💻 Author
-**Skyler Blue Spillers**
-*Professional Chess Player & Software Engineer*
-
----
-*Powered by SkyCoin4444*
+The component can serve as a deterministic pre-screening/risk-signal primitive behind a separately authenticated service boundary. Production integration would require independently validated rules/data, monitoring, audit controls, policy governance, human review paths, privacy controls, and deployment evidence.
