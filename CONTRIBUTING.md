@@ -2,25 +2,38 @@
 
 ## Development Setup
 
+Use Elixir 1.18 / OTP 27 and run the same checks enforced by CI:
+
 ```bash
-npm install
-npm run build
-npm test
+mix format --check-formatted
+mix compile --warnings-as-errors
+mix test
+mix escript.build
+./sky_fraud 2000000 20 ZZ false false
+```
+
+For container verification:
+
+```bash
+docker build -t sky-fraud-rules:local .
+test "$(docker run --rm --entrypoint /usr/bin/id sky-fraud-rules:local -u)" != "0"
+docker run --rm sky-fraud-rules:local 12500 1 US true true
 ```
 
 ## Code Style
 
-- Use TypeScript strict mode
-- Follow ESLint rules
-- Format with Prettier
-- Write meaningful commit messages
+- Keep the component dependency-light and deterministic.
+- Run `mix format` before committing.
+- Compile with warnings treated as errors.
+- Add ExUnit coverage for behavioral changes.
+- Preserve the advisory-only product boundary; do not present risk signals as proof of fraud or automatic consequential decisions.
 
 ## Pull Requests
 
-1. Create a feature branch
-2. Make your changes
-3. Run tests and linting
-4. Submit PR with description
+1. Create a focused feature branch.
+2. Make bounded changes with truthful product boundaries.
+3. Run the format, compile, test, escript, and container checks above.
+4. Submit a PR describing supported behavior and remaining limitations.
 
 ## License
 
