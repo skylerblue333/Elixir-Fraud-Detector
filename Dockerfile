@@ -1,4 +1,4 @@
-FROM hexpm/elixir:1.18.4-erlang-27.3-debian-bookworm-20250224-slim AS builder
+FROM elixir:1.18.4-otp-27 AS builder
 WORKDIR /src
 COPY mix.exs ./
 COPY lib ./lib
