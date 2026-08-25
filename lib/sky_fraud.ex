@@ -16,11 +16,36 @@ defmodule SkyFraud do
          {:ok, trusted_device} <- boolean(input, "trusted_device", false) do
       signals =
         []
-        |> maybe_signal(amount >= 1_000_000, "high_amount", 35, "amount is at least 10,000 major currency units at 2-decimal scale")
-        |> maybe_signal(velocity >= 10, "high_velocity", 30, "ten or more transactions were reported in the last hour")
-        |> maybe_signal(not MapSet.member?(@countries, country), "unlisted_country", 20, "country is outside the built-in demonstration allowlist")
-        |> maybe_signal(not card_present, "card_not_present", 10, "transaction is marked card-not-present")
-        |> maybe_signal(not trusted_device, "untrusted_device", 15, "device is not marked trusted")
+        |> maybe_signal(
+          amount >= 1_000_000,
+          "high_amount",
+          35,
+          "amount is at least 10,000 major currency units at 2-decimal scale"
+        )
+        |> maybe_signal(
+          velocity >= 10,
+          "high_velocity",
+          30,
+          "ten or more transactions were reported in the last hour"
+        )
+        |> maybe_signal(
+          not MapSet.member?(@countries, country),
+          "unlisted_country",
+          20,
+          "country is outside the built-in demonstration allowlist"
+        )
+        |> maybe_signal(
+          not card_present,
+          "card_not_present",
+          10,
+          "transaction is marked card-not-present"
+        )
+        |> maybe_signal(
+          not trusted_device,
+          "untrusted_device",
+          15,
+          "device is not marked trusted"
+        )
         |> Enum.reverse()
 
       score = signals |> Enum.map(& &1.points) |> Enum.sum() |> min(100)
@@ -43,8 +68,13 @@ defmodule SkyFraud do
     case Map.get(input, "country") do
       value when is_binary(value) ->
         value = value |> String.trim() |> String.upcase()
-        if Regex.match?(~r/^[A-Z]{2}$/, value), do: {:ok, value}, else: {:error, "country must be a two-letter code"}
-      _ -> {:error, "country must be a two-letter code"}
+
+        if Regex.match?(~r/^[A-Z]{2}$/, value),
+          do: {:ok, value},
+          else: {:error, "country must be a two-letter code"}
+
+      _ ->
+        {:error, "country must be a two-letter code"}
     end
   end
 
@@ -55,7 +85,9 @@ defmodule SkyFraud do
     end
   end
 
-  defp maybe_signal(signals, true, id, points, reason), do: [%{id: id, points: points, reason: reason} | signals]
+  defp maybe_signal(signals, true, id, points, reason),
+    do: [%{id: id, points: points, reason: reason} | signals]
+
   defp maybe_signal(signals, false, _id, _points, _reason), do: signals
 end
 
@@ -78,7 +110,10 @@ defmodule SkyFraud.CLI do
           {:error, error} -> fail(error)
         end
 
-      _ -> fail("usage: sky_fraud <amount_minor> <transactions_last_hour> <country> <card_present> <trusted_device>")
+      _ ->
+        fail(
+          "usage: sky_fraud <amount_minor> <transactions_last_hour> <country> <card_present> <trusted_device>"
+        )
     end
   end
 
