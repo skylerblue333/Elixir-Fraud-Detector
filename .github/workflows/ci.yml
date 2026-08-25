@@ -1,12 +1,34 @@
-name: CI
-on: [push, pull_request]
+name: fraud-rules-ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  verify:
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
         with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - run: pytest tests/ -v
+          otp-version: '27.3'
+          elixir-version: '1.18.4'
+      - name: Format
+        run: mix format --check-formatted
+      - name: Compile warnings as errors
+        run: mix compile --warnings-as-errors
+      - name: Tests
+        run: mix test
+      - name: Build escript
+        run: mix escript.build
+      - name: CLI smoke
+        run: ./sky_fraud 2000000 20 ZZ false false | grep 'decision=advisory_only'
+      - name: Build image
+        run: docker build -t sky-fraud-rules:${{ github.sha }} .
+      - name: Verify non-root image
+        run: test "$(docker run --rm --entrypoint /usr/bin/id sky-fraud-rules:${{ github.sha }} -u)" != "0"
+      - name: Container smoke
+        run: docker run --rm sky-fraud-rules:${{ github.sha }} 12500 1 US true true | grep 'band=low'
