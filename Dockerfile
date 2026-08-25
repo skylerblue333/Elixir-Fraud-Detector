@@ -1,8 +1,11 @@
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-ENV PYTHONPATH=/app
-EXPOSE 8080
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+FROM elixir:1.18.4-otp-27 AS builder
+WORKDIR /src
+COPY mix.exs ./
+COPY lib ./lib
+RUN mix escript.build
+
+FROM elixir:1.18.4-otp-27
+RUN useradd --system --uid 10001 --no-create-home sky
+COPY --from=builder /src/sky_fraud /usr/local/bin/sky_fraud
+USER 10001:10001
+ENTRYPOINT ["/usr/local/bin/sky_fraud"]
